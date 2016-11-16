@@ -1,0 +1,41 @@
+{
+    "name": "dotplant/store-bookmarks",
+    "description": "Bookmarks functionality for dotplant-store",
+    "type": "dotplant-extension",
+    "keywords": ["yii2", "dotplant", "dotplant3", "bookmark", "dotplant-store", "store"],
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Gorbunov Roman",
+            "email": "gorbunov@devgroup.ru"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0",
+        "yiisoft/yii2": "~2.0.0",
+        "devgroup/yii2-extensions-manager": "dev-master",
+        "dotplant/store": "dev-master"
+    },
+    "require-dev": {
+
+    },
+    "autoload": {
+        "psr-4": {
+            "DotPlant\\StoreBookmarks\\": "src/"
+        }
+    },
+    "extra": {
+        "yii2-extension": {
+            "name": "DotPlant Store Bookmarks",
+            "name_ru": "DotPlant Избранные товары",
+            "iconUrl": "",
+            "description_ru": "Списки избранных товаров пользователя для магазина Dotplant Store"
+        },
+        "migrationPath": [
+            "src/migrations"
+        ],
+        "configurables": "src/configurables.php",
+        "translationCategory": "dotplant.store-bookmarks"
+    }
+}
