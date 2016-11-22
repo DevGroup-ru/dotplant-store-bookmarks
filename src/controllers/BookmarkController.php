@@ -7,6 +7,7 @@ use DotPlant\Monster\Universal\ServiceMonsterAction;
 use DotPlant\Store\models\goods\Goods;
 use DotPlant\StoreBookmarks\Module;
 use Yii;
+use yii\web\Response;
 
 /**
  * Class BookmarksController
@@ -41,6 +42,7 @@ class BookmarkController extends \yii\web\Controller
      */
     public function actionAdd($id, $groupId = null)
     {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         $goods = Goods::get($id);
         if ($goods !== null) {
             return Module::getStorage()->add($id, $groupId);
@@ -54,6 +56,7 @@ class BookmarkController extends \yii\web\Controller
      * @return int
      */
     public function actionRemove($id) {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         return Module::getStorage()->remove($id);
     }
 
@@ -63,6 +66,7 @@ class BookmarkController extends \yii\web\Controller
      * @return int
      */
     public function actionMove($id, $groupId) {
+        Yii::$app->response->format = Response::FORMAT_JSON;
         return Module::getStorage()->move($id, $groupId);
     }
 

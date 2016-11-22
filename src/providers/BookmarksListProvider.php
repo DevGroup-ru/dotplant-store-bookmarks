@@ -2,7 +2,6 @@
 
 namespace DotPlant\StoreBookmarks\providers;
 
-use DevGroup\Frontend\Universal\ActionData;
 use DotPlant\Monster\DataEntity\DataEntityProvider;
 use DotPlant\StoreBookmarks\Module;
 
