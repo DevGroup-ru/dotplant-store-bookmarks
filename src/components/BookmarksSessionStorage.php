@@ -2,7 +2,6 @@
 
 namespace DotPlant\StoreBookmarks\components;
 
-use yii\data\ArrayDataProvider;
 use Yii;
 
 class BookmarksSessionStorage implements BookmarksStorageInterface

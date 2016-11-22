@@ -14,7 +14,7 @@ class BookmarksDbStorage implements BookmarksStorageInterface
      */
     public function add($id, $groupId = null)
     {
-        if ($this->loadBookmark($id) !== null) {
+        if ($this->loadBookmark($id) === null) {
             $bookmark = new Bookmark;
             $bookmark->attributes = [
                 'goods_id' => $id,
@@ -59,7 +59,7 @@ class BookmarksDbStorage implements BookmarksStorageInterface
      */
     public function getList($groupId = null)
     {
-        $query = (new Bookmark)
+        $query = Bookmark::find()
             ->asArray(true)
             ->where(['user_id' => Yii::$app->user->id]);
         if ($groupId !== null) {

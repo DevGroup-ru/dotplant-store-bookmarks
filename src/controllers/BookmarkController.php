@@ -19,13 +19,8 @@ class BookmarkController extends \yii\web\Controller
      */
     public function actionIndex($groupId = null)
     {
-        $data = Module::getStorage()->getList();
-        return $this->render(
-            'list',
-            [
-                'dataProvider' => $data,
-            ]
-        );
+        $bookmarks = Module::getStorage()->getList($groupId);
+        var_dump($bookmarks);
     }
 
     /**
@@ -45,35 +40,19 @@ class BookmarkController extends \yii\web\Controller
 
     /**
      * @param int $id
-     * @return bool
+     * @return int
      */
     public function actionRemove($id) {
         return Module::getStorage()->remove($id);
     }
 
     /**
-     * Перенос закладки в новую группу (только для авторизованных)
-     *
-     * @param $id int
-     * @param $groupId int
-     * @return string|\yii\web\Response
+     * @param int $id
+     * @param int $groupId
+     * @return int
      */
     public function actionMove($id, $groupId) {
-        if (is_numeric($id) && is_numeric($groupId)) {
-            if ($this->storage->moveBookmark($id, $groupId)) {
-                return $this->redirect('index');
-            } else {
-                return $this->render('error', [
-                    'errortype' => "Ошибка переноса записи",
-                    'errormessage' => "Не удалось перенести запись в группу",
-                ]);
-            }
-        } else {
-            return $this->render('error', [
-                'errortype' => "Ошибка переноса записи",
-                'errormessage' => "Необходимо передать id закладки и id группы",
-            ]);
-        }
+        return Module::getStorage()->move($id, $groupId);
     }
 
     /**
