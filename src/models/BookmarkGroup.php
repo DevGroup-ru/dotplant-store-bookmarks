@@ -12,14 +12,14 @@ use DevGroup\Users\helpers\ModelMapHelper;
  * @property integer $user_id
  * @property string $name
  */
-class BookmarksGroupsModel extends \yii\db\ActiveRecord
+class BookmarkGroup extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%dotplant_store_bookmarks_groups}}';
+        return '{{%dotplant_store_bookmark_group}}';
     }
 
     /**
@@ -31,7 +31,13 @@ class BookmarksGroupsModel extends \yii\db\ActiveRecord
             [['user_id'], 'required'],
             [['user_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => ModelMapHelper::User()['class'], 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => ModelMapHelper::User()['class'],
+                'targetAttribute' => ['user_id' => 'id'],
+            ],
         ];
     }
 
@@ -42,7 +48,7 @@ class BookmarksGroupsModel extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('dotplant.store-bookmarks', 'ID'),
-            'user_id' => Yii::t('dotplant.store-bookmarks', 'User ID'),
+            'user_id' => Yii::t('dotplant.store-bookmarks', 'User'),
             'name' => Yii::t('dotplant.store-bookmarks', 'Group name'),
         ];
     }

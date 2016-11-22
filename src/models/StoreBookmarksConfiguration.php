@@ -13,7 +13,7 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
      */
     public function getModuleClassName()
     {
-        return StoreBookmarksModule::className();
+        return Module::class;
     }
 
     /**
@@ -21,9 +21,7 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
      */
     public function rules()
     {
-        return [
-            [['enableBookmarks'], 'boolean'],
-        ];
+        return [];
     }
 
     /**
@@ -31,9 +29,7 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
      */
     public function attributeLabels()
     {
-        return [
-            'enableBookmarks' => Yii::t('dotplant.store-bookmarks', 'Enable Bookmarks'),
-        ];
+        return [];
     }
 
     /**
@@ -69,9 +65,8 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
                 ],
             ],
             'modules' => [
-                'moduleName' => [
-                    'class' => BookMarksModule::class,
-                    'enableBookmarks' => (bool) $this->enableBookmarks
+                'store-bookmarks' => [
+                    'class' => Module::class,
                 ]
             ],
         ];

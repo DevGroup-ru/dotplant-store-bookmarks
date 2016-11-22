@@ -2,13 +2,13 @@
 
 namespace DotPlant\StoreBookmarks\components;
 
+use DotPlant\StoreBookmarks\models\Bookmark;
+use DotPlant\StoreBookmarks\models\BookmarkGroup;
 use Yii;
 use yii\data\ActiveDataProvider;
-use DotPlant\StoreBookmarks\models\BookmarksItemsModel;
-use DotPlant\StoreBookmarks\models\BookmarksGroupsModel;
 
-class BookmarksDbStorage implements BookmarksStorageInterface {
-
+class BookmarksDbStorage implements BookmarksStorageInterface
+{
     private $user_id = null;
 
     public function __construct()
@@ -23,16 +23,14 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
      * @param null $groupId
      * @return bool|int
      */
-    public function addBookmark($id, $groupId = null)
+    public function add($id, $groupId = null)
     {
         $output = false;
-        $bookmark = new BookmarksItemsModel();
-
+        $bookmark = new Bookmark();
         if (!empty($this->user_id)) {
-            $bookmarkExist = BookmarksItemsModel::find()
+            $bookmarkExist = Bookmark::find()
                 ->where(['goods_id' => $groupId, 'user_id' => $this->user_id])
                 ->one();
-
             // Сохраняем если итем новый
             if(empty($bookmarkExist)) {
                 $bookmark->goods_id = $id;
@@ -51,11 +49,11 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
     {
         $output = false;
         if (!empty($this->user_id)) {
-            $bookmarkG = new BookmarksGroupsModel();
-            $bookmarkGExist = BookmarksGroupsModel::find()
+            $bookmarkG = new BookmarkGroup();
+            $bookmarkGExist = BookmarkGroup::find()
                 ->where(['name' => $name, 'user_id' => $this->user_id])
                 ->one();
-            if(empty($bookmarkGExist)) {
+            if (empty($bookmarkGExist)) {
                 $bookmarkG->name = $name;
                 $bookmarkG->user_id = $this->user_id;
                 $bookmarkG->save();
@@ -72,13 +70,13 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
      * @param $groupId
      * @return bool
      */
-    public function moveBookmark($id, $groupId)
+    public function move($id, $groupId)
     {
         $output = false;
-        if(!empty($this->user_id)) {
-            $bookmark = BookmarksItemsModel::findOne($id);
-            $bookmarkG = BookmarksGroupsModel::findOne($groupId);
-            if(!empty($bookmark) && !empty($bookmarkG)) {
+        if (!empty($this->user_id)) {
+            $bookmark = Bookmark::findOne($id);
+            $bookmarkG = BookmarkGroup::findOne($groupId);
+            if (!empty($bookmark) && !empty($bookmarkG)) {
                 $bookmark->bookmarks_groups_id = $groupId;
                 $bookmark->save();
                 $output = true;
@@ -95,13 +93,13 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
      * @param $id
      * @return bool
      */
-    public function removeBookmark($id)
+    public function remove($id)
     {
         $output = false;
-        if(!empty($this->user_id)) {
-            $bookmark = BookmarksItemsModel::findOne($id);
-            if(!empty($bookmark)) {
-                if($bookmark->delete()) {
+        if (!empty($this->user_id)) {
+            $bookmark = Bookmark::findOne($id);
+            if (!empty($bookmark)) {
+                if ($bookmark->delete()) {
                     $output = true;
                 }
             }
@@ -117,11 +115,13 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
     public function getGroups()
     {
         $output = false;
-        if(!empty($this->user_id)) {
+        if (!empty($this->user_id)) {
             $this->user_id = Yii::$app->user->id;
-            $dataProvider = new ActiveDataProvider([
-                'query' => BookmarksGroupsModel::find()->where(['user_id' => $this->user_id]),
-            ]);
+            $dataProvider = new ActiveDataProvider(
+                [
+                    'query' => BookmarkGroup::find()->where(['user_id' => $this->user_id]),
+                ]
+            );
             $output = $dataProvider;
         }
         return $output;
@@ -130,10 +130,10 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
     public function removeGroup($id)
     {
         $output = false;
-        if(!empty($this->user_id)) {
-            $bookmark = BookmarksGroupsModel::findOne($id);
-            if(!empty($bookmark)) {
-                if($bookmark->delete()) {
+        if (!empty($this->user_id)) {
+            $bookmark = BookmarkGroup::findOne($id);
+            if (!empty($bookmark)) {
+                if ($bookmark->delete()) {
                     $output = true;
                 }
             }
@@ -149,14 +149,15 @@ class BookmarksDbStorage implements BookmarksStorageInterface {
     public function getList()
     {
         $output = false;
-        if(!empty($this->user_id)) {
+        if (!empty($this->user_id)) {
             $this->user_id = Yii::$app->user->id;
-            $dataProvider = new ActiveDataProvider([
-                'query' => BookmarksItemsModel::find()->where(['user_id' => $this->user_id])->with('group'),
-            ]);
+            $dataProvider = new ActiveDataProvider(
+                [
+                    'query' => Bookmark::find()->where(['user_id' => $this->user_id])->with('group'),
+                ]
+            );
             $output = $dataProvider;
         }
         return $output;
     }
-
 }

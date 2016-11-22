@@ -7,5 +7,5 @@
 ?>
 
 <div class="box-body">
-    <?= $form->field($model, 'enableBookmarks')->checkbox() ?>
+
 </div>

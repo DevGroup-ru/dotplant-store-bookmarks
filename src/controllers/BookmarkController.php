@@ -2,10 +2,8 @@
 
 namespace DotPlant\StoreBookmarks\controllers;
 
+use DotPlant\StoreBookmarks\Module;
 use Yii;
-use DotPlant\StoreBookmarks\models\BookmarksItemsModel;
-use DotPlant\StoreBookmarks\models\BookmarksGroupsModel;
-use DotPlant\StoreBookmarks\StoreBookmarksModule;
 
 /**
  * Class BookmarksController
@@ -13,16 +11,16 @@ use DotPlant\StoreBookmarks\StoreBookmarksModule;
  *
  * @package DotPlant\StoreBookmarks\controllers
  */
-class BookmarksController extends \yii\web\Controller
+class BookmarkController extends \yii\web\Controller
 {
     /**
      * @var \DotPlant\StoreBookmarks\components\BookmarksDbStorage|\DotPlant\StoreBookmarks\components\BookmarksSessionStorage|null
      */
     private $storage = null;
 
-    public function __construct($id, $module, $config = [])
+    public function __construct($id, $module, $config = []) // @todo: remove it
     {
-        $this->storage = StoreBookmarksModule::getStorage();
+        $this->storage = Module::getStorage();
         parent::__construct($id, $module, $config);
     }
 

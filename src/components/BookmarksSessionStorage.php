@@ -5,13 +5,13 @@ namespace DotPlant\StoreBookmarks\components;
 use yii\data\ArrayDataProvider;
 use Yii;
 
-class BookmarksSessionStorage implements BookmarksStorageInterface {
-
-    private $session = null;
+class BookmarksSessionStorage implements BookmarksStorageInterface
+{
+    private $_session = null;
 
     public function __construct()
     {
-        $this->session = Yii::$app->session;
+        $this->_session = Yii::$app->session;
     }
 
     /**
@@ -21,22 +21,22 @@ class BookmarksSessionStorage implements BookmarksStorageInterface {
      * @param null $groupId
      * @return int|string
      */
-    public function addBookmark($id, $groupId = null)
+    public function add($id, $groupId = null)
     {
-        $data = $this->session['store-bookmarks'];
-        if(is_array($data)) {
-            foreach($data as $key => $dat) {
-                if(isset($dat['goods_id'])) {
+        $data = $this->_session['store-bookmarks'];
+        if (is_array($data)) {
+            foreach ($data as $key => $dat) {
+                if (isset($dat['goods_id'])) {
                     if ($dat['goods_id'] == $id) {
                         return $key;
                     }
                 }
             }
         } else {
-            $data = array();
+            $data = [];
         }
         $data[]['goods_id'] = $id;
-        $this->session->set('store-bookmarks', $data);
+        $this->_session->set('store-bookmarks', $data);
         return count($data) - 1;
     }
 
@@ -58,7 +58,7 @@ class BookmarksSessionStorage implements BookmarksStorageInterface {
      * @param $groupID
      * @return bool
      */
-    public function moveBookmark($id, $groupID)
+    public function move($id, $groupID)
     {
         return false;
     }
@@ -69,13 +69,13 @@ class BookmarksSessionStorage implements BookmarksStorageInterface {
      * @param $id
      * @return bool
      */
-    public function removeBookmark($id)
+    public function remove($id)
     {
         $output = false;
-        $data = $this->session['store-bookmarks'];
-        if(is_array($data)) {
-            foreach($data as $key => $dat) {
-                if(isset($dat['goods_id'])) {
+        $data = $this->_session['store-bookmarks'];
+        if (is_array($data)) {
+            foreach ($data as $key => $dat) {
+                if (isset($dat['goods_id'])) {
                     if ($key == $id) {
                         unset($data[$key]);
                         $output = true;
@@ -83,9 +83,9 @@ class BookmarksSessionStorage implements BookmarksStorageInterface {
                 }
             }
         } else {
-            $data = array();
+            $data = [];
         }
-        $this->session->set('store-bookmarks', $data);
+        $this->_session->set('store-bookmarks', $data);
         return $output;
     }
 
@@ -117,14 +117,15 @@ class BookmarksSessionStorage implements BookmarksStorageInterface {
      * @return bool|ArrayDataProvider
      */
     public function getList()
-    {;
-        if (!$data = $this->session['store-bookmarks']) {
+    {
+        if (!$data = $this->_session['store-bookmarks']) {
             $data = [];
         }
-        $dataProvider = new ArrayDataProvider([
-            'allModels' => $data
-        ]);
+        $dataProvider = new ArrayDataProvider(
+            [
+                'allModels' => $data
+            ]
+        );
         return $dataProvider;
     }
-
 }

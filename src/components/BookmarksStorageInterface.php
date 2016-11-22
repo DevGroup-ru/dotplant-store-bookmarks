@@ -2,19 +2,19 @@
 
 namespace DotPlant\StoreBookmarks\components;
 
-interface BookmarksStorageInterface {
+interface BookmarksStorageInterface
+{
+    public function add($id, $groupId = null);
 
-    public function addBookmark($id, $groupId = null);
+    public function move($id, $groupId);
+
+    public function remove($id);
+
+    public function getList();
 
     public function addGroup($name);
 
-    public function moveBookmark($id, $groupId);
-
-    public function removeBookmark($id);
-
-    public function getGroups();
-
     public function removeGroup($id);
 
-    public function getList();
+    public function getGroups();
 }
