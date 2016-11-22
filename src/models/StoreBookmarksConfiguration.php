@@ -8,6 +8,8 @@ use Yii;
 
 class StoreBookmarksConfiguration extends BaseConfigurationModel
 {
+    public $bookmarksListServiceTemplateKey = 'bookmarksList';
+
     /**
      * @inheritdoc
      */
@@ -21,7 +23,10 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
      */
     public function rules()
     {
-        return [];
+        return [
+            [['bookmarksListServiceTemplateKey'], 'required'],
+            [['bookmarksListServiceTemplateKey'], 'string', 'max' => 255],
+        ];
     }
 
     /**
@@ -29,7 +34,9 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
      */
     public function attributeLabels()
     {
-        return [];
+        return [
+            'bookmarksListServiceTemplateKey' => Yii::t('dotplant.store-bookmarks', 'Key from service template for bookmarks list'),
+        ];
     }
 
     /**
@@ -67,6 +74,7 @@ class StoreBookmarksConfiguration extends BaseConfigurationModel
             'modules' => [
                 'store-bookmarks' => [
                     'class' => Module::class,
+                    'bookmarksListServiceTemplateKey' => $this->bookmarksListServiceTemplateKey,
                 ]
             ],
         ];

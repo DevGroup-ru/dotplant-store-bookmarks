@@ -2,6 +2,8 @@
 
 namespace DotPlant\StoreBookmarks\controllers;
 
+use DevGroup\Frontend\Universal\SuperAction;
+use DotPlant\Monster\Universal\ServiceMonsterAction;
 use DotPlant\Store\models\goods\Goods;
 use DotPlant\StoreBookmarks\Module;
 use Yii;
@@ -15,12 +17,21 @@ use Yii;
 class BookmarkController extends \yii\web\Controller
 {
     /**
-     * @return string
+     * @inheritdoc
      */
-    public function actionIndex($groupId = null)
+    public function actions()
     {
-        $bookmarks = Module::getStorage()->getList($groupId);
-        var_dump($bookmarks);
+        return [
+            'index' => [
+                'class' => SuperAction::class,
+                'actions' => [
+                    [
+                        'class' => ServiceMonsterAction::class,
+                        'serviceTemplateKey' => Module::module()->bookmarksListServiceTemplateKey,
+                    ],
+                ],
+            ]
+        ];
     }
 
     /**

@@ -7,6 +7,7 @@ use Yii;
 class BookmarksSessionStorage implements BookmarksStorageInterface
 {
     const SESSION_KEY_BOOKMARKS = 'DotPlant.StoreBookmarks.List';
+
     /**
      * @inheritdoc
      */

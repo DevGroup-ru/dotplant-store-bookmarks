@@ -8,6 +8,8 @@ use DotPlant\StoreBookmarks\components\BookmarksDbStorage;
 
 class Module extends \yii\base\Module
 {
+    public $bookmarksListServiceTemplateKey = 'bookmarksList';
+
     /**
      * @var BookmarksDbStorage|BookmarksSessionStorage Storage for bookmarks
      */
