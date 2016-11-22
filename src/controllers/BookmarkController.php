@@ -2,6 +2,7 @@
 
 namespace DotPlant\StoreBookmarks\controllers;
 
+use DotPlant\Store\models\goods\Goods;
 use DotPlant\StoreBookmarks\Module;
 use Yii;
 
@@ -14,102 +15,40 @@ use Yii;
 class BookmarkController extends \yii\web\Controller
 {
     /**
-     * @var \DotPlant\StoreBookmarks\components\BookmarksDbStorage|\DotPlant\StoreBookmarks\components\BookmarksSessionStorage|null
+     * @return string
      */
-    private $storage = null;
-
-    public function __construct($id, $module, $config = []) // @todo: remove it
+    public function actionIndex($groupId = null)
     {
-        $this->storage = Module::getStorage();
-        parent::__construct($id, $module, $config);
-    }
-
-    /**
-     * Вывод списка закладок
-     *
-     * @return string|\yii\web\Response
-     */
-    public function actionIndex()
-    {
-        $data = $this->storage->getList();
-        return $this->render('list', [
-            'dataProvider' => $data,
-        ]);
-    }
-
-    /**
-     * Добавление новой закладки
-     *
-     * @param $id int
-     * @param $groupId int
-     * @return string|\yii\web\Response
-     */
-    public function actionAddBookmark($id, $groupId = null)
-    {
-        if(is_numeric($id)) {
-            $this->storage->addBookmark($id, $groupId);
-            return $this->redirect('index');
-        } else {
-            return $this->render('error', [
-                'errortype' => "Ошибка создания записи",
-                'errormessage' => "Необходимо передать id товара",
-            ]);
-        }
-    }
-
-    /**
-     * Вывод списка групп пользователя
-     *
-     * @return string|\yii\web\Response
-     */
-    public function actionGroups() {
-        $data = $this->storage->getGroups();
-        if($data) {
-            return $this->render('groups', [
+        $data = Module::getStorage()->getList();
+        return $this->render(
+            'list',
+            [
                 'dataProvider' => $data,
-            ]);
+            ]
+        );
+    }
+
+    /**
+     * @param int $id
+     * @param null|int $groupId
+     * @return int
+     */
+    public function actionAdd($id, $groupId = null)
+    {
+        $goods = Goods::get($id);
+        if ($goods !== null) {
+            return Module::getStorage()->add($id, $groupId);
+        } else {
+            return 0;
         }
     }
 
     /**
-     * Добаление новой группы закладок для пользователя (только для авторизованного)
-     *
-     * @param $name string
-     * @return string|\yii\web\Response
+     * @param int $id
+     * @return bool
      */
-    public function actionAddGroup($name) {
-        if($this->storage->addGroup($name)) {
-            return $this->redirect('index');
-        } else {
-            return $this->render('error', [
-                'errortype' => "Ошибка создания группы",
-                'errormessage' => "Не удалось создать группу",
-            ]);
-        }
-    }
-
-    /**
-     * Удаление закладки
-     *
-     * @param $id int
-     * @return string|\yii\web\Response
-     */
-    public function actionRemoveBookmark($id) {
-        if(is_numeric($id)) {
-            if($this->storage->removeBookmark($id)) {
-                return $this->redirect('index');
-            } else {
-                return $this->render('error', [
-                    'errortype' => "Ошибка удаления записи",
-                    'errormessage' => "Удаление не удалось",
-                ]);
-            }
-        } else {
-            return $this->render('error', [
-                'errortype' => "Ошибка удаления записи",
-                'errormessage' => "Необходимо передать id закладки",
-            ]);
-        }
+    public function actionRemove($id) {
+        return Module::getStorage()->remove($id);
     }
 
     /**
@@ -120,8 +59,8 @@ class BookmarkController extends \yii\web\Controller
      * @return string|\yii\web\Response
      */
     public function actionMove($id, $groupId) {
-        if(is_numeric($id) && is_numeric($groupId)) {
-            if($this->storage->moveBookmark($id, $groupId)) {
+        if (is_numeric($id) && is_numeric($groupId)) {
+            if ($this->storage->moveBookmark($id, $groupId)) {
                 return $this->redirect('index');
             } else {
                 return $this->render('error', [
@@ -134,6 +73,47 @@ class BookmarkController extends \yii\web\Controller
                 'errortype' => "Ошибка переноса записи",
                 'errormessage' => "Необходимо передать id закладки и id группы",
             ]);
+        }
+    }
+
+    /**
+     * ==========================================      Groups      ==========================================
+     */
+
+    /**
+     * Вывод списка групп пользователя
+     *
+     * @return string|\yii\web\Response
+     */
+    public function actionGroups() {
+        $data = $this->storage->getGroups();
+        if ($data) {
+            return $this->render(
+                'groups',
+                [
+                    'dataProvider' => $data,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Добаление новой группы закладок для пользователя (только для авторизованного)
+     *
+     * @param $name string
+     * @return string|\yii\web\Response
+     */
+    public function actionAddGroup($name) {
+        if ($this->storage->addGroup($name)) {
+            return $this->redirect('index');
+        } else {
+            return $this->render(
+                'error',
+                [
+                    'errortype' => "Ошибка создания группы",
+                    'errormessage' => "Не удалось создать группу",
+                ]
+            );
         }
     }
 

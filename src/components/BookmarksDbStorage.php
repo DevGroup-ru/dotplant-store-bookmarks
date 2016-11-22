@@ -9,41 +9,68 @@ use yii\data\ActiveDataProvider;
 
 class BookmarksDbStorage implements BookmarksStorageInterface
 {
-    private $user_id = null;
-
-    public function __construct()
-    {
-        $this->user_id = Yii::$app->user->id;
-    }
-
     /**
-     * Добавление элемента закладки
-     *
-     * @param int $id
-     * @param null $groupId
-     * @return bool|int
+     * @inheritdoc
      */
     public function add($id, $groupId = null)
     {
-        $output = false;
-        $bookmark = new Bookmark();
-        if (!empty($this->user_id)) {
-            $bookmarkExist = Bookmark::find()
-                ->where(['goods_id' => $groupId, 'user_id' => $this->user_id])
-                ->one();
-            // Сохраняем если итем новый
-            if(empty($bookmarkExist)) {
-                $bookmark->goods_id = $id;
-                $bookmark->user_id = $this->user_id;
-                if(is_numeric($groupId)) {
-                    $bookmark->bookmarks_groups_id = $groupId;
-                }
-                $bookmark->save();
-            }
-            $output = $bookmark->id;
+        if ($this->loadBookmark($id) !== null) {
+            $bookmark = new Bookmark;
+            $bookmark->attributes = [
+                'goods_id' => $id,
+                'user_id' => Yii::$app->user->id,
+                'bookmark_group_id' => $groupId,
+            ];
+            return (int) $bookmark->save();
+        } else {
+            return 1;
         }
-        return $output;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function move($id, $groupId)
+    {
+        $bookmark = $this->loadBookmark($id);
+        if ($bookmark !== null) {
+            $bookmark->bookmark_group_id = $groupId;
+            return (int) $bookmark->save(true, ['bookmark_group_id']);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove($id)
+    {
+        $bookmark = $this->loadBookmark($id);
+        if ($bookmark !== null) {
+            return (int) $bookmark->delete();
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getList($groupId = null)
+    {
+        $query = (new Bookmark)
+            ->asArray(true)
+            ->where(['user_id' => Yii::$app->user->id]);
+        if ($groupId !== null) {
+            $query->andWhere(['bookmark_group_id' => $groupId]);
+        }
+        return $query->all();
+    }
+
+    /**
+     * ====================================    Groups    ====================================
+     */
 
     public function addGroup($name)
     {
@@ -59,50 +86,6 @@ class BookmarksDbStorage implements BookmarksStorageInterface
                 $bookmarkG->save();
             }
             $output = $bookmarkG->id;
-        }
-        return $output;
-    }
-
-    /**
-     * Перенос закладки в группу
-     *
-     * @param $id
-     * @param $groupId
-     * @return bool
-     */
-    public function move($id, $groupId)
-    {
-        $output = false;
-        if (!empty($this->user_id)) {
-            $bookmark = Bookmark::findOne($id);
-            $bookmarkG = BookmarkGroup::findOne($groupId);
-            if (!empty($bookmark) && !empty($bookmarkG)) {
-                $bookmark->bookmarks_groups_id = $groupId;
-                $bookmark->save();
-                $output = true;
-            } else {
-                $output = false;
-            }
-        }
-        return $output;
-    }
-
-    /**
-     * Удаление закладки
-     *
-     * @param $id
-     * @return bool
-     */
-    public function remove($id)
-    {
-        $output = false;
-        if (!empty($this->user_id)) {
-            $bookmark = Bookmark::findOne($id);
-            if (!empty($bookmark)) {
-                if ($bookmark->delete()) {
-                    $output = true;
-                }
-            }
         }
         return $output;
     }
@@ -142,22 +125,11 @@ class BookmarksDbStorage implements BookmarksStorageInterface
     }
 
     /**
-     * Получение списка в виде yii\data\ActiveDataProvide
-     *
-     * @return bool|ActiveDataProvider
+     * Load the bookmark by id
+     * @param int $id
      */
-    public function getList()
+    protected function loadBookmark($id)
     {
-        $output = false;
-        if (!empty($this->user_id)) {
-            $this->user_id = Yii::$app->user->id;
-            $dataProvider = new ActiveDataProvider(
-                [
-                    'query' => Bookmark::find()->where(['user_id' => $this->user_id])->with('group'),
-                ]
-            );
-            $output = $dataProvider;
-        }
-        return $output;
+        return Bookmark::findOne(['user_id' => Yii::$app->user->id, 'goods_id' => $id]);
     }
 }

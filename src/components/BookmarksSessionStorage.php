@@ -7,38 +7,63 @@ use Yii;
 
 class BookmarksSessionStorage implements BookmarksStorageInterface
 {
-    private $_session = null;
-
-    public function __construct()
-    {
-        $this->_session = Yii::$app->session;
-    }
-
+    const SESSION_KEY_BOOKMARKS = 'DotPlant.StoreBookmarks.List';
     /**
-     * Добавление элемента закладки
-     *
-     * @param $id
-     * @param null $groupId
-     * @return int|string
+     * @inheritdoc
      */
     public function add($id, $groupId = null)
     {
-        $data = $this->_session['store-bookmarks'];
-        if (is_array($data)) {
-            foreach ($data as $key => $dat) {
-                if (isset($dat['goods_id'])) {
-                    if ($dat['goods_id'] == $id) {
-                        return $key;
-                    }
-                }
-            }
-        } else {
-            $data = [];
+        $goodsIds = Yii::$app->session->get(self::SESSION_KEY_BOOKMARKS, []);
+        if (!in_array($id, $goodsIds)) {
+            $goodsIds[] = $id;
+            Yii::$app->session->set(self::SESSION_KEY_BOOKMARKS, $goodsIds);
         }
-        $data[]['goods_id'] = $id;
-        $this->_session->set('store-bookmarks', $data);
-        return count($data) - 1;
+        return 1;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function move($id, $groupID)
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove($id)
+    {
+        $goodsIds = Yii::$app->session->get(self::SESSION_KEY_BOOKMARKS, []);
+        $index = array_search($id, $goodsIds);
+        if ($index !== false) {
+            unset($goodsIds[$index]);
+            Yii::$app->session->set(self::SESSION_KEY_BOOKMARKS, $goodsIds);
+            return 1;
+        }
+        return 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getList($groupId = null)
+    {
+        $goodsIds = Yii::$app->session->get(self::SESSION_KEY_BOOKMARKS, []);
+        $result = [];
+        foreach ($goodsIds as $goodsId) {
+            $result[] = [
+                'user_id' => null,
+                'goods_id' => $goodsId,
+                'bookmark_group_id' => null,
+            ];
+        }
+        return $result;
+    }
+
+    /**
+     * ===============================    Groups    ===============================
+     */
 
     /**
      * Невозможно добавить группу для гостя
@@ -49,44 +74,6 @@ class BookmarksSessionStorage implements BookmarksStorageInterface
     public function addGroup($name)
     {
         return false;
-    }
-
-    /**
-     * Невозможно изменить группу для гостя
-     *
-     * @param $id
-     * @param $groupID
-     * @return bool
-     */
-    public function move($id, $groupID)
-    {
-        return false;
-    }
-
-    /**
-     * Удаление закладки
-     *
-     * @param $id
-     * @return bool
-     */
-    public function remove($id)
-    {
-        $output = false;
-        $data = $this->_session['store-bookmarks'];
-        if (is_array($data)) {
-            foreach ($data as $key => $dat) {
-                if (isset($dat['goods_id'])) {
-                    if ($key == $id) {
-                        unset($data[$key]);
-                        $output = true;
-                    }
-                }
-            }
-        } else {
-            $data = [];
-        }
-        $this->_session->set('store-bookmarks', $data);
-        return $output;
     }
 
     /**
@@ -108,24 +95,5 @@ class BookmarksSessionStorage implements BookmarksStorageInterface
     public function removeGroup($id)
     {
         return false;
-    }
-
-
-    /**
-     * Получение списка в виде yii\data\ArrayDataProvide
-     *
-     * @return bool|ArrayDataProvider
-     */
-    public function getList()
-    {
-        if (!$data = $this->_session['store-bookmarks']) {
-            $data = [];
-        }
-        $dataProvider = new ArrayDataProvider(
-            [
-                'allModels' => $data
-            ]
-        );
-        return $dataProvider;
     }
 }
